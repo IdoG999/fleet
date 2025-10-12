@@ -1,0 +1,15 @@
+{
+  "name": "fleet-management",
+  "version": "1.0.0",
+  "description": "Fleet management system with Node.js and React",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm start",
+    "client": "cd client && npm start",
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
+
