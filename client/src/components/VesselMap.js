@@ -1,10 +1,16 @@
 import React, { useState, useMemo } from 'react';
-import Map, { Marker, Popup } from 'react-map-gl';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
 import { Box, Typography, Divider } from '@mui/material';
 import DirectionsBoatIcon from '@mui/icons-material/DirectionsBoat';
 
-// you need to add your own mapbox token here
-const MAPBOX_TOKEN = 'pk.eyJ1IjoiZXhhbXBsZSIsImEiOiJjbGV4YW1wbGUifQ.example'; // Replace with your token
+// custom simple boat icon using MUI color
+const boatIcon = new L.DivIcon({
+  className: 'custom-boat-icon',
+  html: '<div style="color:#1976d2;font-size:24px;">⛵️</div>',
+  iconSize: [24, 24],
+  iconAnchor: [12, 24]
+});
 
 // map component to show vessel locations
 function VesselMap({ vessels }) {
@@ -12,8 +18,8 @@ function VesselMap({ vessels }) {
   const [selectedVessel, setSelectedVessel] = useState(null);
   // map view settings
   const [viewState, setViewState] = useState({
-    longitude: 0,
-    latitude: 20,
+    lng: 0,
+    lat: 20,
     zoom: 2
   });
 
@@ -31,61 +37,40 @@ function VesselMap({ vessels }) {
       const avgLng = lngs.reduce((a, b) => a + b, 0) / lngs.length;
       const avgLat = lats.reduce((a, b) => a + b, 0) / lats.length;
       
-      setViewState(prev => ({
-        ...prev,
-        longitude: avgLng,
-        latitude: avgLat,
-        zoom: 3
-      }));
+      setViewState(prev => ({ ...prev, lng: avgLng, lat: avgLat, zoom: 3 }));
     }
   }, [vesselsWithLocation.length]);
 
+  // helper to fly the map to center once computed
+  function MapFlyTo({ center, zoom }) {
+    const map = useMap();
+    useMemo(() => {
+      map.setView([center.lat, center.lng], zoom);
+    }, [center.lat, center.lng, zoom]);
+    return null;
+  }
+
   return (
     <Box sx={{ height: 600, width: '100%', position: 'relative' }}>
-      <Map
-        {...viewState}
-        onMove={evt => setViewState(evt.viewState)}
-        mapStyle="mapbox://styles/mapbox/streets-v12"
-        mapboxAccessToken={MAPBOX_TOKEN}
+      <MapContainer
+        center={[viewState.lat, viewState.lng]}
+        zoom={viewState.zoom}
         style={{ width: '100%', height: '100%' }}
       >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <MapFlyTo center={{ lat: viewState.lat, lng: viewState.lng }} zoom={viewState.zoom} />
         {vesselsWithLocation.map((vessel) => {
           const [lng, lat] = vessel.location.geometry.coordinates;
           return (
-            <Marker
-              key={vessel._id}
-              longitude={lng}
-              latitude={lat}
-              anchor="bottom"
-              onClick={(e) => {
-                e.originalEvent.stopPropagation();
-                setSelectedVessel(vessel);
-              }}
-            >
-              <DirectionsBoatIcon
-                sx={{
-                  fontSize: 30,
-                  color: 'primary.main',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    color: 'secondary.main',
-                    transform: 'scale(1.2)',
-                  },
-                  transition: 'all 0.2s'
-                }}
-              />
-            </Marker>
+            <Marker key={vessel._id} position={[lat, lng]} icon={boatIcon} eventHandlers={{ click: () => setSelectedVessel(vessel) }} />
           );
         })}
 
         {selectedVessel && selectedVessel.location?.geometry?.coordinates && (
-          <Popup
-            longitude={selectedVessel.location.geometry.coordinates[0]}
-            latitude={selectedVessel.location.geometry.coordinates[1]}
-            anchor="top"
-            onClose={() => setSelectedVessel(null)}
-            closeOnClick={false}
-          >
+          <Popup position={[selectedVessel.location.geometry.coordinates[1], selectedVessel.location.geometry.coordinates[0]]} onClose={() => setSelectedVessel(null)}>
             <Box sx={{ p: 1, minWidth: 200 }}>
               <Typography variant="h6" gutterBottom>
                 {selectedVessel.name || 'Unknown Vessel'}
@@ -122,7 +107,7 @@ function VesselMap({ vessels }) {
             </Box>
           </Popup>
         )}
-      </Map>
+      </MapContainer>
       
       {vesselsWithLocation.length === 0 && (
         <Box
