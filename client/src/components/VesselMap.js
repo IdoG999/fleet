@@ -3,8 +3,8 @@ import Map, { Marker, Popup } from 'react-map-gl';
 import { Box, Typography, Divider } from '@mui/material';
 import DirectionsBoatIcon from '@mui/icons-material/DirectionsBoat';
 
-// you need to add your own mapbox token here
-const MAPBOX_TOKEN = 'pk.eyJ1IjoiZXhhbXBsZSIsImEiOiJjbGV4YW1wbGUifQ.example'; // Replace with your token
+// mapbox token comes from env: REACT_APP_MAPBOX_TOKEN
+const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 
 // map component to show vessel locations
 function VesselMap({ vessels }) {
@@ -39,6 +39,20 @@ function VesselMap({ vessels }) {
       }));
     }
   }, [vesselsWithLocation.length]);
+
+  // if there's no token, show a helpful message
+  if (!MAPBOX_TOKEN) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          Map is unavailable
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Please set REACT_APP_MAPBOX_TOKEN in your environment to enable the map.
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ height: 600, width: '100%', position: 'relative' }}>
