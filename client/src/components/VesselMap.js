@@ -3,23 +3,26 @@ import Map, { Marker, Popup } from 'react-map-gl';
 import { Box, Typography, Divider } from '@mui/material';
 import DirectionsBoatIcon from '@mui/icons-material/DirectionsBoat';
 
-// Mapbox access token - You'll need to add your own token
+// you need to add your own mapbox token here
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiZXhhbXBsZSIsImEiOiJjbGV4YW1wbGUifQ.example'; // Replace with your token
 
+// map component to show vessel locations
 function VesselMap({ vessels }) {
+  // which vessel is selected for popup
   const [selectedVessel, setSelectedVessel] = useState(null);
+  // map view settings
   const [viewState, setViewState] = useState({
     longitude: 0,
     latitude: 20,
     zoom: 2
   });
 
-  // Calculate bounds to fit all vessels
+  // figure out which vessels have location data
   const vesselsWithLocation = useMemo(() => {
     return vessels.filter(v => v.location?.geometry?.coordinates);
   }, [vessels]);
 
-  // Set initial view based on vessels
+  // center the map on the vessels
   useMemo(() => {
     if (vesselsWithLocation.length > 0) {
       const lngs = vesselsWithLocation.map(v => v.location.geometry.coordinates[0]);

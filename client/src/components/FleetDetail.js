@@ -26,26 +26,38 @@ import axios from 'axios';
 import API_BASE_URL from '../config';
 import VesselMap from './VesselMap';
 
+// fleet detail page with vessels and map
 function FleetDetail() {
+  // get fleet id from url
   const { fleetId } = useParams();
+  // navigation hook
   const navigate = useNavigate();
+  // fleet info
   const [fleetData, setFleetData] = useState(null);
+  // all vessels in fleet
   const [vessels, setVessels] = useState([]);
+  // filtered vessels after search
   const [filteredVessels, setFilteredVessels] = useState([]);
+  // loading state
   const [loading, setLoading] = useState(true);
+  // error handling
   const [error, setError] = useState(null);
+  // sorting state
   const [orderBy, setOrderBy] = useState('name');
+  // sort direction
   const [order, setOrder] = useState('asc');
   
-  // Search filters
+  // search filters
   const [searchName, setSearchName] = useState('');
   const [searchMmsi, setSearchMmsi] = useState('');
   const [searchFlag, setSearchFlag] = useState('');
 
+  // load vessels when fleet changes
   useEffect(() => {
     fetchFleetVessels();
   }, [fleetId]);
 
+  // get vessels for this fleet
   const fetchFleetVessels = async () => {
     try {
       setLoading(true);
@@ -62,6 +74,7 @@ function FleetDetail() {
     }
   };
 
+  // search through vessels
   const handleSearch = async () => {
     try {
       const params = new URLSearchParams();
@@ -78,6 +91,7 @@ function FleetDetail() {
     }
   };
 
+  // clear search and show all vessels
   const handleClearSearch = () => {
     setSearchName('');
     setSearchMmsi('');
@@ -85,22 +99,24 @@ function FleetDetail() {
     setFilteredVessels(vessels);
   };
 
+  // handle column sorting
   const handleSort = (property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
 
+  // sort vessels based on current settings
   const sortedVessels = useMemo(() => {
     return [...filteredVessels].sort((a, b) => {
       let aValue = a[orderBy];
       let bValue = b[orderBy];
 
-      // Handle null/undefined values
+      // handle missing values
       if (aValue == null) return order === 'asc' ? 1 : -1;
       if (bValue == null) return order === 'asc' ? -1 : 1;
 
-      // Handle string comparison
+      // make sure strings compare properly
       if (typeof aValue === 'string') {
         aValue = aValue.toLowerCase();
         bValue = bValue?.toLowerCase() || '';
@@ -114,6 +130,7 @@ function FleetDetail() {
     });
   }, [filteredVessels, order, orderBy]);
 
+  // show loading spinner
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
@@ -122,6 +139,7 @@ function FleetDetail() {
     );
   }
 
+  // fleet not found
   if (!fleetData) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -155,7 +173,7 @@ function FleetDetail() {
         </Alert>
       )}
 
-      {/* Search Section */}
+      {/* search section */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -209,7 +227,7 @@ function FleetDetail() {
         </CardContent>
       </Card>
 
-      {/* Vessels Table */}
+      {/* vessels table */}
       <Paper elevation={3} sx={{ mb: 3 }}>
         <TableContainer sx={{ maxHeight: 500 }}>
           <Table stickyHeader>
@@ -309,7 +327,7 @@ function FleetDetail() {
         </TableContainer>
       </Paper>
 
-      {/* Map Section */}
+      {/* map section */}
       <Paper elevation={3}>
         <Box sx={{ p: 2 }}>
           <Typography variant="h6" gutterBottom>

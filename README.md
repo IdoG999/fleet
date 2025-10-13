@@ -1,121 +1,58 @@
-# Fleet Management System
+# Fleet Management App
 
-A full-stack web application for managing and visualizing fleet vessels with real-time location tracking.
+This is a simple web app I built to track and visualize fleet vessels. It shows vessel locations on a map and lets you search through different fleets.
 
-## Features
+## What it does
 
-### Phase 1 - Fleet List
-- Display all fleets in a sortable table
-- Show fleet name and vessel count
-- Click on fleet to view details
+The app has two main pages:
+- **Fleet List**: Shows all fleets in a table. You can sort by name or vessel count, and click any fleet to see its details.
+- **Fleet Details**: Shows all vessels in a selected fleet. There's a search bar to filter vessels, a sortable table, and a map showing where each vessel is located.
 
-### Phase 2 - Fleet Details
-- View detailed information about vessels in a fleet
-- Sortable vessel table with multiple columns (Name, MMSI, Flag, Class, Location)
-- Interactive map showing vessel locations with markers
-- Click vessel markers to view detailed information in popups
+## Tech stuff
 
-### Phase 3 - Search & Filter
-- Search vessels by name, MMSI, and flag
-- Multiple filters work together with AND logic
-- Real-time results displayed in both table and map
+**Backend**: Node.js + Express server that serves vessel data from JSON files
+**Frontend**: React app with Material-UI components and Mapbox for the map
 
-## Technology Stack
+## Getting started
 
-### Backend
-- Node.js with Express
-- Efficient in-memory data storage with Map-based indexing
-- RESTful API endpoints
-- CORS enabled for cross-origin requests
-
-### Frontend
-- React 18 with React Router for navigation
-- Material-UI (MUI) for beautiful, modern UI components
-- Mapbox GL JS for interactive maps
-- Axios for API calls
-
-## Installation
-
-1. Install all dependencies:
+First, install everything:
 ```bash
 npm run install-all
 ```
 
-## Running the Application
-
-Start both server and client with a single command:
+Then start the app:
 ```bash
 npm start
 ```
 
-This will:
-- Start the Node.js backend on port 5000
-- Start the React frontend on port 3000
-- Automatically open your browser to http://localhost:3000
+This runs both the backend (port 5000) and frontend (port 3000). Your browser should open automatically.
 
-## API Endpoints
+## Mapbox setup
 
-- `GET /api/fleets` - Get all fleets with basic info
-- `GET /api/fleets/:fleetId/vessels` - Get vessels for a specific fleet
-- `GET /api/vessels/search` - Search vessels (query params: name, mmsi, flag, fleetId)
-- `GET /api/health` - Health check endpoint
+The map won't work without a Mapbox token. Get a free one at mapbox.com, then update the token in `client/src/components/VesselMap.js`:
 
-## Project Structure
-
-```
-ido/
-├── server/
-│   ├── server.js           # Backend server with API routes
-│   └── package.json        # Backend dependencies
-├── client/
-│   ├── public/
-│   │   └── index.html      # HTML template
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── FleetList.js    # Main fleet list page
-│   │   │   ├── FleetDetail.js  # Fleet detail page
-│   │   │   └── VesselMap.js    # Map component
-│   │   ├── App.js          # Main app component with routing
-│   │   ├── index.js        # React entry point
-│   │   └── index.css       # Global styles
-│   └── package.json        # Frontend dependencies
-├── vessels.json            # Vessel data
-├── fleets.json             # Fleet data
-├── vesselLocations.json    # Vessel location data
-├── package.json            # Root package with start script
-└── README.md               # This file
-```
-
-## Configuration
-
-### Mapbox Token
-To use the map functionality, you need to add your Mapbox access token:
-
-1. Sign up for a free account at https://www.mapbox.com/
-2. Get your access token from your account dashboard
-3. Replace the token in `client/src/components/VesselMap.js`:
 ```javascript
-const MAPBOX_TOKEN = 'your-token-here';
+const MAPBOX_TOKEN = 'your-actual-token-here';
 ```
 
-## Features Implemented
+## API
 
-✅ Smart data loading with efficient Map-based indexing (O(1) lookups)  
-✅ Sortable fleet table on main page  
-✅ Fleet detail page with vessel information  
-✅ Interactive Mapbox map with vessel markers  
-✅ Clickable markers with detailed popup information  
-✅ Search functionality with multiple filters (AND logic)  
-✅ Responsive design with Material-UI  
-✅ Single command startup  
-✅ Clean, modern UI with smooth interactions  
+The server has these endpoints:
+- `/api/fleets` - get all fleets
+- `/api/fleets/:id/vessels` - get vessels for a specific fleet  
+- `/api/vessels/search` - search vessels by name, MMSI, or flag
+- `/api/health` - check if server is running
 
-## Notes
+## Files
 
-- The application uses in-memory data storage for fast access
-- All vessel and location data is indexed for O(1) lookup performance
-- The map requires a Mapbox token to function properly
-- Search filters work together with AND logic
-- Tables are fully sortable by clicking column headers
+```
+fleet/
+├── server/           # Backend code
+├── client/           # React frontend
+├── vessels.json      # Vessel data
+├── fleets.json       # Fleet data  
+├── vesselLocations.json  # Location data
+└── package.json      # Root package file
+```
 
-# fleet
+That's about it. The data is stored in memory for fast lookups, and everything should work smoothly once you add your Mapbox token.

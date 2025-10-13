@@ -5,6 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import FleetList from './components/FleetList';
 import FleetDetail from './components/FleetDetail';
 
+// main app colors - blue and red theme
 const theme = createTheme({
   palette: {
     primary: {
@@ -16,6 +17,7 @@ const theme = createTheme({
   },
 });
 
+// main app component - handles routing and theme
 function App() {
   return (
     <ThemeProvider theme={theme}>

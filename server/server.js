@@ -10,34 +10,34 @@ const PORT = process.env.PORT || 5001;
 app.use(cors());
 app.use(express.json());
 
-// Data storage - efficient in-memory structures
+// keeping all the data in memory for fast access
 let vessels = [];
 let fleets = [];
 let vesselLocations = [];
-let vesselMap = new Map(); // For O(1) vessel lookup by ID
-let locationMap = new Map(); // For O(1) location lookup by vessel ID
+let vesselMap = new Map(); // quick vessel lookup by ID
+let locationMap = new Map(); // quick location lookup by vessel ID
 
-// Load and index data on startup
+// load all the data when server starts
 function loadData() {
   try {
-    // Load vessels
+    // grab vessel data
     const vesselsData = fs.readFileSync(path.join(__dirname, '../vessels.json'), 'utf8');
     vessels = JSON.parse(vesselsData);
     
-    // Create vessel index map
+    // build lookup map for vessels
     vessels.forEach(vessel => {
       vesselMap.set(vessel._id, vessel);
     });
     
-    // Load fleets
+    // grab fleet data
     const fleetsData = fs.readFileSync(path.join(__dirname, '../fleets.json'), 'utf8');
     fleets = JSON.parse(fleetsData);
     
-    // Load vessel locations
+    // grab location data
     const locationsData = fs.readFileSync(path.join(__dirname, '../vesselLocations.json'), 'utf8');
     vesselLocations = JSON.parse(locationsData);
     
-    // Create location index map
+    // build lookup map for locations
     vesselLocations.forEach(location => {
       locationMap.set(location._id, location);
     });
@@ -49,10 +49,10 @@ function loadData() {
   }
 }
 
-// Initialize data
+// start loading data
 loadData();
 
-// Helper function to enrich vessel with location data
+// add location info to vessel data
 function enrichVesselWithLocation(vessel) {
   const location = locationMap.get(vessel._id);
   return {
@@ -61,7 +61,7 @@ function enrichVesselWithLocation(vessel) {
   };
 }
 
-// Route: Get all fleets with basic info (Phase 1)
+// get all fleets
 app.get('/api/fleets', (req, res) => {
   try {
     const fleetsBasicInfo = fleets.map(fleet => ({
@@ -77,7 +77,7 @@ app.get('/api/fleets', (req, res) => {
   }
 });
 
-// Route: Get vessels for a specific fleet (Phase 2)
+// get vessels for one fleet
 app.get('/api/fleets/:fleetId/vessels', (req, res) => {
   try {
     const { fleetId } = req.params;
@@ -87,7 +87,7 @@ app.get('/api/fleets/:fleetId/vessels', (req, res) => {
       return res.status(404).json({ error: 'Fleet not found' });
     }
     
-    // Get full vessel details with locations
+    // get all vessel details including locations
     const fleetVessels = fleet.vessels.map(fleetVessel => {
       const vessel = vesselMap.get(fleetVessel._id);
       if (vessel) {
@@ -115,26 +115,26 @@ app.get('/api/fleets/:fleetId/vessels', (req, res) => {
   }
 });
 
-// Route: Search vessels (Phase 3)
+// search through vessels
 app.get('/api/vessels/search', (req, res) => {
   try {
     const { name, mmsi, flag, fleetId } = req.query;
     
-    // Get vessels to search in
+    // figure out which vessels to search
     let vesselsToSearch = [];
     
     if (fleetId) {
-      // Search within a specific fleet
+      // only search this fleet
       const fleet = fleets.find(f => f._id === fleetId);
       if (fleet) {
         vesselsToSearch = fleet.vessels.map(fv => vesselMap.get(fv._id)).filter(v => v);
       }
     } else {
-      // Search all vessels
+      // search everything
       vesselsToSearch = vessels;
     }
     
-    // Apply filters (AND logic)
+    // filter results
     let results = vesselsToSearch;
     
     if (name) {
@@ -157,7 +157,7 @@ app.get('/api/vessels/search', (req, res) => {
       );
     }
     
-    // Enrich with location data
+    // add location info to results
     const enrichedResults = results.map(vessel => {
       const location = locationMap.get(vessel._id);
       return {
@@ -173,7 +173,7 @@ app.get('/api/vessels/search', (req, res) => {
   }
 });
 
-// Health check endpoint
+// check if server is working
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'ok',

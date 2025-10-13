@@ -19,18 +19,27 @@ import DirectionsBoatIcon from '@mui/icons-material/DirectionsBoat';
 import axios from 'axios';
 import API_BASE_URL from '../config';
 
+// main fleet list page
 function FleetList() {
+  // state for managing fleets data
   const [fleets, setFleets] = useState([]);
+  // loading state
   const [loading, setLoading] = useState(true);
+  // error handling
   const [error, setError] = useState(null);
+  // sorting state
   const [orderBy, setOrderBy] = useState('name');
+  // sort direction
   const [order, setOrder] = useState('asc');
+  // navigation hook
   const navigate = useNavigate();
 
+  // load fleets when component mounts
   useEffect(() => {
     fetchFleets();
   }, []);
 
+  // get fleets from the server
   const fetchFleets = async () => {
     try {
       setLoading(true);
@@ -45,18 +54,20 @@ function FleetList() {
     }
   };
 
+  // handle column sorting
   const handleSort = (property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
 
+  // sort the fleets based on current settings
   const sortedFleets = useMemo(() => {
     return [...fleets].sort((a, b) => {
       let aValue = a[orderBy];
       let bValue = b[orderBy];
 
-      // Handle string comparison
+      // make sure strings compare properly
       if (typeof aValue === 'string') {
         aValue = aValue.toLowerCase();
         bValue = bValue.toLowerCase();
@@ -70,10 +81,12 @@ function FleetList() {
     });
   }, [fleets, order, orderBy]);
 
+  // navigate to fleet detail page
   const handleRowClick = (fleetId) => {
     navigate(`/fleet/${fleetId}`);
   };
 
+  // show loading spinner
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
