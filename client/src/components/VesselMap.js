@@ -22,6 +22,8 @@ function VesselMap({ vessels }) {
     lat: 20,
     zoom: 2
   });
+  // error state for map tiles
+  const [mapError, setMapError] = useState(null);
 
   // figure out which vessels have location data
   const vesselsWithLocation = useMemo(() => {
@@ -58,8 +60,14 @@ function VesselMap({ vessels }) {
         style={{ width: '100%', height: '100%' }}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          eventHandlers={{
+            tileerror: (e) => {
+              console.error('Tile loading error:', e);
+              setMapError('Map tiles failed to load. This may be due to rate limiting.');
+            }
+          }}
         />
         <MapFlyTo center={{ lat: viewState.lat, lng: viewState.lng }} zoom={viewState.zoom} />
         {vesselsWithLocation.map((vessel) => {
@@ -124,6 +132,26 @@ function VesselMap({ vessels }) {
         >
           <Typography variant="h6" color="text.secondary">
             No vessel locations available
+          </Typography>
+        </Box>
+      )}
+      
+      {mapError && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 10,
+            left: 10,
+            right: 10,
+            backgroundColor: 'rgba(255, 0, 0, 0.8)',
+            color: 'white',
+            p: 2,
+            borderRadius: 1,
+            textAlign: 'center'
+          }}
+        >
+          <Typography variant="body2">
+            {mapError}
           </Typography>
         </Box>
       )}
