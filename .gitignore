@@ -1,9 +1,32 @@
-# Dependencies
-node_modules/
-package-lock.json
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Production builds
-/client/build
+# Virtual Environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
 
 # Environment variables
 .env
@@ -12,13 +35,14 @@ package-lock.json
 .env.test.local
 .env.production.local
 
-# Debug logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# OS files
+# OS
 .DS_Store
 .DS_Store?
 ._*
@@ -27,16 +51,40 @@ lerna-debug.log*
 ehthumbs.db
 Thumbs.db
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
+# Application specific
+uploads/
+outputs/
+logs/
+*.log
+*.db
+*.sqlite
+*.sqlite3
 
-# Testing
-coverage/
+# API Keys and secrets
+credentials.json
+service-account.json
+*.pem
+*.key
 
-# Misc
-.cache/
+# Temporary files
+tmp/
+temp/
+*.tmp
 
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Docker
+.dockerignore
